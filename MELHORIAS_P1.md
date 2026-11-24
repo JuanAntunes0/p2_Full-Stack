@@ -1,0 +1,6 @@
+# Melhorias da P1
+
+1. **Unicidade global em `Mesa.numero`**: Atualmente `Mesa.numero` tem `unique=True` no banco inteiro[cite: 90]. Em multi-organização (P2), restaurantes diferentes podem ter a mesma numeração de mesas, exigindo unicidade por organização (`UniqueConstraint`) em vez de `unique=True` global[cite: 44].
+2. **Validação de integridade em `Item`**: O model `Item` permite `prato` e `combo` nulos ou opcionais sem validação no model/banco para garantir que existe um item válido associado (e não ambos em falta) nem quantidade inválida/negativa[cite: 90].
+3. **Alterações de estado via `GET` e cálculo de total nas views**: Views como `adicionar_prato`, `adicionar_combo`, `fechar_comanda` e `remover_item` alteram dados sem restringir a método `POST`, e `abrir_comanda` soma o `total` em loop Python em vez de usar agregação do ORM / otimização de consultas (`select_related`)[cite: 91].
+4. **Ausência de autenticação e isolamento por organização nas views**: Nenhuma view exige login nem filtra os querysets (`Prato`, `Combo`, `Mesa`, `Comanda`, `Item`) por organização, o que abrirá vazamento de dados assim que o sistema tiver mais de uma organização[cite: 40, 47, 91].

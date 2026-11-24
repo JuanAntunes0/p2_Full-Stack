@@ -1,0 +1,72 @@
+{% extends 'restaurante/base.html' %}
+
+{% block conteudo %}
+<h2>Dashboard</h2>
+
+<form method="get">
+    {{ form.inicio.label_tag }} {{ form.inicio }}
+    {{ form.fim.label_tag }} {{ form.fim }}
+    <button type="submit">Filtrar</button>
+    <a href="{% url 'dashboard' %}">Limpar</a>
+    {% if pode_exportar %}
+        <a href="{% url 'exportar_dashboard_csv' %}?inicio={{ request.GET.inicio }}&fim={{ request.GET.fim }}">Exportar CSV</a>
+    {% endif %}
+</form>
+
+<section>
+    <h3>Indicadores</h3>
+    <ul>
+        <li>Total de comandas: <strong>{{ kpis.total_comandas }}</strong></li>
+        <li>Comandas abertas: <strong>{{ kpis.comandas_abertas }}</strong></li>
+        <li>Total de itens vendidos: <strong>{{ kpis.total_itens }}</strong></li>
+        <li>Receita no período: <strong>R$ {{ kpis.receita_total }}</strong></li>
+    </ul>
+</section>
+
+<section>
+    <h3>Top 5 Pratos</h3>
+    <ul>
+        {% for item in ranking_pratos %}
+            <li>{{ item.prato__nome }} — {{ item.total }}</li>
+        {% empty %}
+            <li>Sem dados no período.</li>
+        {% endfor %}
+    </ul>
+</section>
+
+<section>
+    <h3>Comandas por Status</h3>
+    <ul>
+        {% for st in distribuicao_status %}
+            <li>{{ st.status }} — {{ st.total }}</li>
+        {% empty %}
+            <li>Sem comandas.</li>
+        {% endfor %}
+    </ul>
+</section>
+
+{% if mostra_series %}
+<section>
+    <h3>Itens por Mês</h3>
+    {{ por_mes|json_script:"dados-mes" }}
+    <canvas id="graficoMes"></canvas>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const dadosMes = JSON.parse(document.getElementById('dados-mes').textContent);
+    const ctx = document.getElementById('graficoMes');
+    if (ctx && dadosMes.length > 0) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dadosMes.map(d => d.mes),
+                datasets: [{
+                    label: 'Itens',
+                    data: dadosMes.map(d => d.total),
+                }]
+            }
+        });
+    }
+</script>
+{% endif %}
+{% endblock %}

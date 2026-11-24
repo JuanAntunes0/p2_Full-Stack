@@ -15,4 +15,6 @@ urlpatterns = [
     path('comanda/<int:comanda_id>/adicionar-combo/<int:combo_id>/', views.adicionar_combo, name='adicionar_combo'),
     path('comanda/<int:comanda_id>/fechar/', views.fechar_comanda, name='fechar_comanda'),
     path('item/<int:item_id>/remover/', views.remover_item, name='remover_item'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/exportar.csv', views.exportar_dashboard_csv, name='exportar_dashboard_csv'),
 ]
